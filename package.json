@@ -1,0 +1,17 @@
+{
+  "name": "open-wa-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "wa-automate --socket -p 8002"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@open-wa/wa-automate": "^4.76.0"
+  }
+}
