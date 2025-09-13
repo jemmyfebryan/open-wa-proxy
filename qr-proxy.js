@@ -99,8 +99,8 @@ app.get("/status", (req, res) => {
   res.json({ status });
 });
 
-app.listen(5000, () => {
-  console.log("🌐 QR proxy running at http://localhost:5000");
+app.listen(8002, () => {
+  console.log("🌐 QR proxy running at http://localhost:8002");
   console.log("   → /qr (JSON)");
   console.log("   → /qr/raw (raw event)");
   console.log("   → /qr.png (PNG image)");
