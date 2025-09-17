@@ -33,29 +33,51 @@ This project provides a **QR proxy for OpenWA**. It allows you to:
 
 ## Setup
 
-1. Clone this repository:
+1. Install Linux Packages
+   ```bash
+   apt-get update && apt-get install -y \
+      libatk-bridge2.0-0t64 \
+      libatk1.0-0t64 \
+      libdrm2 \
+      libxkbcommon0 \
+      libxcomposite1 \
+      libxdamage1 \
+      libxrandr2 \
+      libgbm1 \
+      libasound2t64 \
+      libpangocairo-1.0-0 \
+      libpango-1.0-0 \
+      libcairo2 \
+      libnss3 \
+      libxss1 \
+      fonts-liberation \
+      libappindicator3-1 \
+      libgtk-3-0t64
+   ```
+
+2. Clone this repository:
    ```bash
    git clone <your-repo-url>
    cd <project-folder>
    ```
 
-2. Install dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Start the QR proxy server:
+4. Start the QR proxy server:
    ```bash
    node qr-proxy.js
    ```
 
-4. Start OpenWA in socket mode:
+5. Start OpenWA in socket mode:
    ```bash
    npx @open-wa/wa-automate --socket -p 8002 -k <YOUR_API_KEY> \
      --ev http://localhost:5000/events
    ```
 
-5. Access endpoints:
+6. Access endpoints:
    - `http://localhost:5000/qr.png` → QR image for frontend scanning.
    - `http://localhost:5000/qr` → Base64 JSON.
    - `http://localhost:5000/qr/raw` → Raw event JSON.
@@ -85,45 +107,6 @@ API_KEY = "<YOUR_API_KEY>"
 ```
 
 Then you can use `on_message`, `send_message`, etc.
-
----
-
-## Makefile
-
-A simple Makefile for common tasks:
-
-```makefile
-# Variables
-NODE=node
-NPX=npx
-QR_PROXY=qr-proxy.js
-OPENWA_PORT=8002
-API_KEY=my_secret_api_key
-
-# Install dependencies
-install:
-	npm install
-
-# Start QR Proxy server
-start-proxy:
-	$(NODE) $(QR_PROXY)
-
-# Start OpenWA CLI with socket mode
-start-openwa:
-	$(NPX) @open-wa/wa-automate --socket -p $(OPENWA_PORT) -k $(API_KEY) \
-		--ev http://localhost:5000/events
-
-# Full start (proxy + open-wa)
-start-all:
-	@echo "Start the proxy in one terminal:"
-	@echo "  make start-proxy"
-	@echo "Then start OpenWA in another terminal:"
-	@echo "  make start-openwa"
-
-# Clean QR images (if any)
-clean:
-	rm -f qr_code.png
-```
 
 ---
 
