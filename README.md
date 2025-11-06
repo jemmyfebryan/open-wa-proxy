@@ -35,7 +35,7 @@ This project provides a **QR proxy for OpenWA**. It allows you to:
 
 1. Install Linux Packages
    ```bash
-   apt-get update && apt-get install -y \
+   sudo apt-get update && sudo apt-get install -y \
       libatk-bridge2.0-0t64 \
       libatk1.0-0t64 \
       libdrm2 \

@@ -21,7 +21,7 @@ start-openwa:
 # Start both with PM2
 start-all:
 	pm2 start $(QR_PROXY) --name qr-proxy --interpreter $(NODE)
-	pm2 start $(NPX) --name openwa -- @open-wa/wa-automate --socket -p $(OPENWA_PORT) -k $(API_KEY) --ev http://localhost:8002/events
+	pm2 start $(NPX) --name openwa -- @open-wa/wa-automate --socket -p $(OPENWA_PORT) -k $(API_KEY) --ev http://localhost:8002/events --qr-timeout 0 --auth-timeout 0
 	@echo "✅ Both services started with pm2"
 	@echo "   → pm2 logs qr-proxy"
 	@echo "   → pm2 logs openwa"

@@ -6,6 +6,7 @@ app.use(express.json({ limit: "10mb" }));
 let lastQr = null;
 let lastEvent = null;
 let status = "waiting";
+let hostNumber = null;
 
 // Utility: normalize startup messages into states
 function parseStartupMessage(msg) {
@@ -97,6 +98,12 @@ app.get("/qr.png", (req, res) => {
 // Session status
 app.get("/status", (req, res) => {
   res.json({ status });
+});
+
+// host number
+app.get("/hostnumber", (req, res) => {
+  if (!hostNumber) return res.status(404).json({ error: "Host number not available yet" });
+  res.json({ hostNumber });
 });
 
 app.listen(8002, () => {
