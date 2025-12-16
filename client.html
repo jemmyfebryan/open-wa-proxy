@@ -54,6 +54,12 @@
         const qrImage = document.getElementById('qr-image');
         const statusDisplay = document.getElementById('status-display');
         let currentTimestamp = 0;
+        
+        // If the page URL is 'my_proxy.com/open_wa_proxy/', apiBaseUrl will be '/open_wa_proxy'.
+        // This ensures all subsequent calls are prefixed correctly.
+        const apiBaseUrl = location.pathname.endsWith('/') ? 
+                           location.pathname.slice(0, -1) : 
+                           location.pathname;
 
         function setStatus(newStatus) {
             statusDisplay.textContent = newStatus.toUpperCase();
@@ -63,7 +69,9 @@
         async function updateQrImage() {
             try {
                 // 1. Fetch the latest timestamp and status
-                const response = await fetch('/qr-timestamp');
+                const statusUrl = `${apiBaseUrl}/qr-timestamp`;
+
+                const response = await fetch(statusUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -82,9 +90,11 @@
                         currentTimestamp = latestTimestamp;
 
                         // 3. Cache Busting: Force the browser to fetch the new image
-                        qrImage.src = `/qr.png?t=${latestTimestamp}`; 
+                        // The image source must also be prefixed with the base URL.
+                        const imageUrl = `${apiBaseUrl}/qr.png?t=${latestTimestamp}`;
+                        qrImage.src = imageUrl; 
                         qrImage.alt = "QR Code available";
-                        console.log(`[Client] Image refreshed. New timestamp: ${latestTimestamp}`);
+                        console.log(`[Client] Image refreshed. New URL: ${imageUrl}`);
                     }
                 } else if (serverStatus === 'ready' || serverStatus === 'authenticated') {
                     // Client is connected, hide the QR image
