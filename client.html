@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Linked Device Proxy</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #status-display {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #333;
+            display: block;
+            margin-bottom: 20px;
+        }
+        #qr-image {
+            width: 300px; 
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .status-qr { color: orange; }
+        .status-ready { color: green; }
+        .status-failure { color: red; }
+        .status-waiting { color: gray; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>WhatsApp Client Status</h1>
+        <span id="status-display" class="status-waiting">WAITING</span>
+        
+        <div id="qr-container">
+            <h2>Scan the Code to Connect</h2>
+            <img id="qr-image" src="" alt="QR Code not available">
+        </div>
+    </div>
+
+    <script>
+        const qrImage = document.getElementById('qr-image');
+        const statusDisplay = document.getElementById('status-display');
+        let currentTimestamp = 0;
+
+        function setStatus(newStatus) {
+            statusDisplay.textContent = newStatus.toUpperCase();
+            statusDisplay.className = `status-${newStatus}`;
+        }
+
+        async function updateQrImage() {
+            try {
+                // 1. Fetch the latest timestamp and status
+                const response = await fetch('/qr-timestamp');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                const latestTimestamp = data.timestamp;
+                const serverStatus = data.status || 'waiting';
+
+                // Update the status display
+                setStatus(serverStatus);
+
+                // 2. Logic based on status
+                if (serverStatus === 'qr') {
+                    // QR is available, check if it's new
+                    if (latestTimestamp && latestTimestamp > currentTimestamp) {
+                        currentTimestamp = latestTimestamp;
+
+                        // 3. Cache Busting: Force the browser to fetch the new image
+                        qrImage.src = `/qr.png?t=${latestTimestamp}`; 
+                        qrImage.alt = "QR Code available";
+                        console.log(`[Client] Image refreshed. New timestamp: ${latestTimestamp}`);
+                    }
+                } else if (serverStatus === 'ready' || serverStatus === 'authenticated') {
+                    // Client is connected, hide the QR image
+                    qrImage.src = ''; // Clear image source
+                    qrImage.alt = "Client connected successfully.";
+                    qrImage.style.display = 'none';
+                    // Stop polling if connected
+                    clearInterval(intervalId);
+                    console.log("[Client] Connection established, stopping QR check interval.");
+                } else {
+                    // Statuses like 'loading', 'scanned', or 'failure'
+                    qrImage.src = ''; 
+                    qrImage.alt = `Status: ${serverStatus}`;
+                    qrImage.style.display = 'block'; // Or show a static placeholder image if you have one
+                }
+            } catch (error) {
+                console.error('[Client] Failed to check for QR updates:', error);
+                setStatus('error');
+            }
+        }
+
+        // Start checking for updates every 2 seconds
+        const intervalId = setInterval(updateQrImage, 2000); 
+
+        // Initial load check
+        updateQrImage();
+    </script>
+</body>
+</html>

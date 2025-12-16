@@ -4,37 +4,39 @@ npm-debug.log
 yarn-error.log
 package-lock.json
 yarn.lock
-
 # Environment files
 .env
 .env.local
 .env.*.local
 .node-persist
-
 # OpenWA session and cache files
 session.data.json
 qr-proxy.json
 _IGNORE_session
 server.json
 open-wa-session*
-
 # OS-specific files
 .DS_Store
 Thumbs.db
-
 # Logs
 *.log
-
 # IDEs
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
-
 # Temporary files
 *.tmp
 *.bak
 *.swp
-
 # Unused Files
-server.js
+# server.js
+christoper_session
+jemmy_session
+old_session
+
+# managed by open-wa
+**.data.json
+**.node-persist**
+**_IGNORE_**
+# end managed by open-wa

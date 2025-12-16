@@ -1,7 +1,7 @@
 # Variables
 NODE=node
 NPX=npx
-QR_PROXY=qr-proxy.js
+QR_PROXY=server.js
 OPENWA_PORT=8003
 API_KEY=my_secret_api_key
 
