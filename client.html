@@ -53,13 +53,57 @@
     <script>
         const qrImage = document.getElementById('qr-image');
         const statusDisplay = document.getElementById('status-display');
+        const container = document.querySelector('.container'); // For the timeout message
         let currentTimestamp = 0;
-        
-        // If the page URL is 'my_proxy.com/open_wa_proxy/', apiBaseUrl will be '/open_wa_proxy'.
-        // This ensures all subsequent calls are prefixed correctly.
+        let isTimedOut = false;
+
         const apiBaseUrl = location.pathname.endsWith('/') ? 
-                           location.pathname.slice(0, -1) : 
-                           location.pathname;
+                        location.pathname.slice(0, -1) : 
+                        location.pathname;
+
+        // --- TIMEOUT LOGIC ---
+        let idleTime = 0;
+        const MAX_IDLE_TIME = 60; // 60 seconds
+
+        // Increment the idle counter every second
+        const idleInterval = setInterval(() => {
+            idleTime++;
+            if (idleTime >= MAX_IDLE_TIME) {
+                stopPolling();
+            }
+        }, 1000);
+
+        // Reset timer on any user activity
+        function resetTimer() {
+            if (!isTimedOut) {
+                idleTime = 0;
+            }
+        }
+
+        // Attach listeners for activity
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+            window.addEventListener(evt, resetTimer, true);
+        });
+
+        function stopPolling() {
+            isTimedOut = true;
+            clearInterval(intervalId); // Stops the QR check
+            clearInterval(idleInterval); // Stops the timer check
+            
+            // Update UI to notify user
+            document.getElementById('qr-container').innerHTML = `
+                <div style="padding: 20px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px;">
+                    <p style="color: #856404; font-weight: bold;">Session Timed Out</p>
+                    <p>To prevent resource waste, we stopped checking for QR codes.</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px;">
+                        Refresh Page to Continue
+                    </button>
+                </div>
+            `;
+            setStatus('timed out');
+            console.log("[Client] Idle timeout reached. Requests stopped.");
+        }
+        // ----------------------
 
         function setStatus(newStatus) {
             statusDisplay.textContent = newStatus.toUpperCase();
@@ -67,48 +111,33 @@
         }
 
         async function updateQrImage() {
-            try {
-                // 1. Fetch the latest timestamp and status
-                const statusUrl = `${apiBaseUrl}/qr-timestamp`;
+            if (isTimedOut) return; // Safety check
 
+            try {
+                const statusUrl = `${apiBaseUrl}/qr-timestamp`;
                 const response = await fetch(statusUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
                 
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
                 const latestTimestamp = data.timestamp;
                 const serverStatus = data.status || 'waiting';
 
-                // Update the status display
                 setStatus(serverStatus);
 
-                // 2. Logic based on status
                 if (serverStatus === 'qr') {
-                    // QR is available, check if it's new
                     if (latestTimestamp && latestTimestamp > currentTimestamp) {
                         currentTimestamp = latestTimestamp;
-
-                        // 3. Cache Busting: Force the browser to fetch the new image
-                        // The image source must also be prefixed with the base URL.
                         const imageUrl = `${apiBaseUrl}/qr.png?t=${latestTimestamp}`;
                         qrImage.src = imageUrl; 
                         qrImage.alt = "QR Code available";
-                        console.log(`[Client] Image refreshed. New URL: ${imageUrl}`);
+                        console.log(`[Client] Image refreshed.`);
                     }
                 } else if (serverStatus === 'ready' || serverStatus === 'authenticated') {
-                    // Client is connected, hide the QR image
-                    qrImage.src = ''; // Clear image source
-                    qrImage.alt = "Client connected successfully.";
                     qrImage.style.display = 'none';
-                    // Stop polling if connected
                     clearInterval(intervalId);
-                    console.log("[Client] Connection established, stopping QR check interval.");
-                } else {
-                    // Statuses like 'loading', 'scanned', or 'failure'
-                    qrImage.src = ''; 
-                    qrImage.alt = `Status: ${serverStatus}`;
-                    qrImage.style.display = 'block'; // Or show a static placeholder image if you have one
+                    clearInterval(idleInterval); // Also stop timeout if already logged in
+                    console.log("[Client] Connected, intervals cleared.");
                 }
             } catch (error) {
                 console.error('[Client] Failed to check for QR updates:', error);
