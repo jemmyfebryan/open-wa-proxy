@@ -14,9 +14,8 @@ wa.create({
 }).then(client => start(client));
 
 function start(client) {
-  client.sendText("6285189924108@c.us", "HALO BANG WOI")
   client.onMessage(async message => {
-    if (message.body === 'Hi') {
+    if (message.body === 'Hi testing 123 123 345 678') {
       await client.sendText(message.from, '👋 Hello!');
     }
   });
