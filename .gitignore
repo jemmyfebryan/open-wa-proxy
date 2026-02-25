@@ -41,4 +41,5 @@ old_session
 **.data.json
 **.node-persist**
 **_IGNORE_**
+open-wa**.json
 # end managed by open-wa

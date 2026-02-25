@@ -34,20 +34,7 @@ start-instance:
 		node -e "const d=require('./$(INSTANCES_FILE)'); d.instances.forEach(i=>console.log('      - '+i.name))"; \
 		exit 1; \
 	fi
-	@echo "🚀 Starting instance: $(INSTANCE)"
-	@echo "   → Proxy port: $$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.proxy_port);")"
-	@echo "   → OpenWA port: $$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.openwa_port);")"
-	@echo "   → Session folder: $$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.session_folder);")"
-	@PROXY_PORT=$$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.proxy_port);") \
-	OPENWA_PORT=$$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.openwa_port);") \
-	API_KEY=$$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.api_key);") \
-	SESSION=$$(node -e "const d=require('./$(INSTANCES_FILE)'); const i=d.instances.find(x=>x.name==='$(INSTANCE)'); console.log(i.session_folder);") \
-	PROXY_PORT=$$PROXY_PORT INSTANCE_NAME=$(INSTANCE) pm2 start $(QR_PROXY) --name "qr-proxy-$(INSTANCE)" --interpreter $(NODE) -- $$PROXY_PORT $(INSTANCE); \
-	pm2 start $(NPX) --name "openwa-$(INSTANCE)" -- @open-wa/wa-automate --socket -p $$OPENWA_PORT -k $$API_KEY --ev http://localhost:$$PROXY_PORT/events --qr-timeout 0 --auth-timeout 0 --session $$SESSION
-	@echo "✅ Instance '$(INSTANCE)' started"
-	@echo "   → pm2 logs qr-proxy-$(INSTANCE)"
-	@echo "   → pm2 logs openwa-$(INSTANCE)"
-	@echo "   → View QR at: http://localhost:$$(node -e 'const d=require(\"./$(INSTANCES_FILE)\"); const i=d.instances.find(x=>x.name===\"$(INSTANCE)\"); console.log(i.proxy_port);')/"
+	@./start-instance.sh $(INSTANCE)
 
 # Stop a specific instance
 # Usage: make stop-instance INSTANCE=jemmy

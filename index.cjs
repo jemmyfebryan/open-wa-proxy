@@ -1,7 +1,7 @@
 const wa = require('@open-wa/wa-automate');
 
 wa.create({
-  sessionId: "session_jemmy",
+  sessionId: "session",
   multiDevice: true, //required to enable multiDevice support
   authTimeout: 60, //wait only 60 seconds to get a connection with the host account device
   blockCrashLogs: true,
