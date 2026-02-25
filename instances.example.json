@@ -1,0 +1,18 @@
+{
+  "instances": [
+    {
+      "name": "instance1",
+      "openwa_port": 8003,
+      "proxy_port": 8002,
+      "api_key": "CHANGE_THIS_TO_YOUR_SECRET_API_KEY",
+      "session_folder": "instance1_session"
+    },
+    {
+      "name": "instance2",
+      "openwa_port": 8005,
+      "proxy_port": 8004,
+      "api_key": "CHANGE_THIS_TO_ANOTHER_SECRET_API_KEY",
+      "session_folder": "instance2_session"
+    }
+  ]
+}

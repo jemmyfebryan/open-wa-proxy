@@ -9,6 +9,8 @@ yarn.lock
 .env.local
 .env.*.local
 .node-persist
+# Instance configuration (contains API keys)
+instances.json
 # OpenWA session and cache files
 session.data.json
 qr-proxy.json

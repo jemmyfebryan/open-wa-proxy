@@ -1,11 +1,17 @@
 import express from "express";
 // 💡 Required for serving static files (like the HTML page)
-import path from "path"; 
+import path from "path";
 import { fileURLToPath } from 'url';
 
 // Helper to get directory name in ES Module scope
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Get configuration from environment or command line args
+// args: node server.js [port] [instance_name]
+const args = process.argv.slice(2);
+const PORT = process.env.PROXY_PORT || args[0] || 8002;
+const INSTANCE_NAME = process.env.INSTANCE_NAME || args[1] || 'default';
 
 const app = express();
 app.use(express.json({ limit: "10mb" }));
@@ -123,7 +129,7 @@ app.get("/hostnumber", (req, res) => {
   res.json({ hostNumber });
 });
 
-app.listen(8002, () => {
-  console.log("🌐 QR proxy running at http://localhost:8002");
-  console.log("   → View Realtime QR at: http://localhost:8002/"); // The main client URL
+app.listen(PORT, () => {
+  console.log(`🌐 QR proxy for instance '${INSTANCE_NAME}' running at http://localhost:${PORT}`);
+  console.log(`   → View Realtime QR at: http://localhost:${PORT}/`);
 });
